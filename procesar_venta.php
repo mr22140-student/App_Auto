@@ -1,6 +1,21 @@
 <?php
 include("conexion.php");
 
+// =========================================================================
+// FUNCIONES DE SOPORTE (Declaradas al principio para evitar errores)
+// =========================================================================
+function obtenerIdCuenta($conexion, $codigo_cuenta) {
+    $codigo_cuenta = mysqli_real_escape_string($conexion, $codigo_cuenta);
+    $resultado = mysqli_query($conexion, "SELECT id FROM catalogo_cuentas WHERE codigo = '$codigo_cuenta'");
+    if ($row = mysqli_fetch_assoc($resultado)) {
+        return intval($row['id']);
+    }
+    return null; 
+}
+
+// =========================================================================
+// PROCESAMIENTO DE LA FORMULARIO DE VENTA
+// =========================================================================
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['cantidad'])) {
     $cliente_id = intval($_POST['cliente_id']);
     $tipo_pago_form = $_POST['tipo_pago'];
@@ -34,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['cantidad'])) {
         $query_venta = "INSERT INTO venta (cliente_id, fecha, total) VALUES ($cliente_id, '$fecha_actual', $total_venta)";
         
         if (mysqli_query($conn, $query_venta)) {
-            $venta_id = mysqli_insert_id($conn); // ID de la venta creada
+            $venta_id = mysqli_insert_id($conn); // Recuperamos el ID de la venta creada
 
             // 2. Descontar las existencias del inventario y guardar el detalle de la venta
             foreach ($productos_a_vender as $p) {
@@ -45,24 +60,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['cantidad'])) {
                 // Restar del stock
                 mysqli_query($conn, "UPDATE producto SET stock = stock - $cant WHERE id = $pid");
                 
-                // Mapeo correcto de precio_unitario
-              // LÍNEA 49 CORREGIDA:
-            mysqli_query($conn, "INSERT INTO detalle_venta (venta_id, producto_id, cantidad, precio_unitario) VALUES ($venta_id, $pid, $cant, $prc)");
+                // Mapeo correcto de cantidad y precio_unitario
+                mysqli_query($conn, "INSERT INTO detalle_venta (venta_id, producto_id, cantidad, precio_unitario) VALUES ($venta_id, $pid, $cant, $prc)");
             }
 
             // 3. Formatear las variables para tu tabla relacional 'pago'
             $subtipo_tarjeta = 'NINGUNO';
-            if ($tipo_pago_form == 'TARJETA_DEBITO') {
+            if ($tipo_pago_form == 'TARJETA_DEBITO' || $tipo_pago_form == 'TARJETA_CREDITO') {
                 $tipo_pago_base = 'TARJETA';
-                $subtipo_tarjeta = 'DEBITO';
-                $cuenta_destino_id = 2; // ID de la cuenta "BANCOS" en tu catálogo de cuentas
-            } elseif ($tipo_pago_form == 'TARJETA_CREDITO') {
-                $tipo_pago_base = 'TARJETA';
-                $subtipo_tarjeta = 'CREDITO';
-                $cuenta_destino_id = 2; // ID de la cuenta "BANCOS"
+                $subtipo_tarjeta = ($tipo_pago_form == 'TARJETA_DEBITO') ? 'DEBITO' : 'CREDITO';
+                $cuenta_destino_id = obtenerIdCuenta($conn, '1102'); // Código de BANCOS
             } else {
                 $tipo_pago_base = 'EFECTIVO';
-                $cuenta_destino_id = 1; // ID de la cuenta "CAJA GENERAL" en tu catálogo
+                $subtipo_tarjeta = 'NINGUNO';
+                $cuenta_destino_id = obtenerIdCuenta($conn, '1101'); // Código de CAJA GENERAL
             }
 
             // Insertar en tu tabla 'pago'
@@ -72,34 +83,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['cantidad'])) {
 
 
             // =========================================================================
-            // 4. AUTOMATIZACIÓN DEL LIBRO DIARIO (NUEVO CAMBIO)
+            // 4. AUTOMATIZACIÓN INTELIGENTE DEL LIBRO DIARIO
             // =========================================================================
-            
-            // Cuenta de Ventas (Ingresos) e Inventarios. Reemplaza estos IDs por los de tu catálogo real.
-            $cuenta_ventas_id = 5;       // ID asignado a la cuenta "VENTAS"
-            $cuenta_inventario_id = 3;   // ID asignado a la cuenta "INVENTARIOS / MERCANCÍAS"
-            $cuenta_costo_venta_id = 6;  // ID asignado a la cuenta "COSTO DE VENTAS"
+            $cuenta_ventas_id      = obtenerIdCuenta($conn, '4101'); // Código de VENTAS
+            $cuenta_inventario_id  = obtenerIdCuenta($conn, '1103'); // Código de INVENTARIO
+            $cuenta_costo_venta_id = obtenerIdCuenta($conn, '5101'); // Código de COSTO DE VENTAS
 
             $descripcion_asiento = "Venta de repuestos bajo factura general - Venta #" . $venta_id;
 
-            // --- REGISTRO 1: Entrada de dinero (Debe) a Caja o Bancos ---
-            mysqli_query($conn, "INSERT INTO libro_diario (cuenta_id, fecha, descripcion, debe, haber) 
-                                 VALUES ($cuenta_destino_id, '$fecha_actual', '$descripcion_asiento', $total_venta, 0)");
+            if ($cuenta_destino_id && $cuenta_ventas_id) {
+                // --- REGISTRO 1: Entrada de efectivo o banco (Debe) ---
+                mysqli_query($conn, "INSERT INTO libro_diario (cuenta_id, fecha, descripcion, debe, haber) 
+                                     VALUES ($cuenta_destino_id, '$fecha_actual', '$descripcion_asiento', $total_venta, 0)");
 
-            // --- REGISTRO 2: Reconocimiento del ingreso (Haber) en Ventas ---
-            mysqli_query($conn, "INSERT INTO libro_diario (cuenta_id, fecha, descripcion, debe, haber) 
-                                 VALUES ($cuenta_ventas_id, '$fecha_actual', '$descripcion_asiento', 0, $total_venta)");
+                // --- REGISTRO 2: Reconocimiento del ingreso (Haber) ---
+                mysqli_query($conn, "INSERT INTO libro_diario (cuenta_id, fecha, descripcion, debe, haber) 
+                                     VALUES ($cuenta_ventas_id, '$fecha_actual', '$descripcion_asiento', 0, $total_venta)");
+            }
 
-            // --- REGISTRO 3: Salida del Inventario a Costo de Ventas (Opcional si manejan costos) ---
-            // Supongamos un costo estimado del 60% del valor de venta para propósitos didácticos
-            $costo_estimado = $total_venta * 0.60;
-            
-            mysqli_query($conn, "INSERT INTO libro_diario (cuenta_id, fecha, descripcion, debe, haber) 
-                                 VALUES ($cuenta_costo_venta_id, '$fecha_actual', 'Reconocimiento del costo de repuestos vendidos', $costo_estimado, 0)");
-            
-            mysqli_query($conn, "INSERT INTO libro_diario (cuenta_id, fecha, descripcion, debe, haber) 
-                                 VALUES ($cuenta_inventario_id, '$fecha_actual', 'Salida de existencias de almacén por venta', 0, $costo_estimado)");
-            
+            if ($cuenta_costo_venta_id && $cuenta_inventario_id) {
+                // --- REGISTRO 3 y 4: Costo de Ventas e Inventario (60% estimado) ---
+                $costo_estimado = $total_venta * 0.60;
+                
+                mysqli_query($conn, "INSERT INTO libro_diario (cuenta_id, fecha, descripcion, debe, haber) 
+                                     VALUES ($cuenta_costo_venta_id, '$fecha_actual', 'Reconocimiento del costo de repuestos vendidos', $costo_estimado, 0)");
+                
+                mysqli_query($conn, "INSERT INTO libro_diario (cuenta_id, fecha, descripcion, debe, haber) 
+                                     VALUES ($cuenta_inventario_id, '$fecha_actual', 'Salida de existencias de almacén por venta', 0, $costo_estimado)");
+            }
             // =========================================================================
 
             // Redireccionar al éxito
