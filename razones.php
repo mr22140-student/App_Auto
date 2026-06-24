@@ -50,11 +50,12 @@ $margen_utilidad = $ventas_totales > 0 ? (($utilidad_neta / $ventas_totales) * 1
         <div>
             <a href="index.php">Inicio</a>
             <a href="productos.php">Productos</a>
+            <a href="clientes.php">Clientes</a>
             <a href="ventas.php">Ventas</a>
             <a href="compras.php">Compras</a>
             <a href="librodiario.php">Libro Diario</a>
             <a href="catalogo.php">Catálogo y Manual</a>
-            <a href="razones.php" class="text-warning-custom">Razones Financieras</a>
+            <a href="razones.php">Razones Financieras</a>
             <a href="reportes.php">Reportes</a>
         </div>
     </div>

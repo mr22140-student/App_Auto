@@ -26,6 +26,7 @@ $asientos = mysqli_query($conn, "
             <a href="compras.php">Compras</a>
             <a href="librodiario.php">Libro Diario</a>
             <a href="catalogo.php">Catálogo y Manual</a>
+            <a href="razones.php">Razones Financieras</a>
             <a href="reportes.php">Reportes</a>
         </div>
     </div>
