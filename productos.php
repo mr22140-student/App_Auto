@@ -66,6 +66,7 @@ $productos = mysqli_query($conn, "SELECT * FROM producto ORDER BY id DESC");
             <a href="catalogo.php">Catálogo y Manual</a>
             <a href="razones.php">Razones Financieras</a>
             <a href="balance_comprobacion.php">Balance Comprobación</a>
+            <a href="analisis_financiero.php">Análisis H/V</a>
             <a href="reportes.php">Reportes</a>
         </div>
     </div>
