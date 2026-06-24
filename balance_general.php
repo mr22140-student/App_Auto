@@ -86,6 +86,7 @@ $esta_cuadrado = abs($total_activos - $total_pasivo_patrimonio) < 0.01;
             <a href="ventas.php">Ventas</a>
             <a href="compras.php">Compras</a>
             <a href="librodiario.php">Libro Diario</a>
+            <a href="libromayor.php">Libro Mayor</a>
             <a href="catalogo.php">Catálogo y Manual</a>
             <a href="razones.php">Razones Financieras</a>
             <a href="balance_general.php">Balance General</a>
