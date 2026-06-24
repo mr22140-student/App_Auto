@@ -59,13 +59,14 @@ $productos = mysqli_query($conn, "SELECT * FROM producto ORDER BY id DESC");
         <div>
             <a href="index.php">Inicio</a>
             <a href="productos.php">Productos</a>
+            <a href="clientes.php">Clientes</a>
             <a href="ventas.php">Ventas</a>
             <a href="compras.php">Compras</a>
             <a href="librodiario.php">Libro Diario</a>
             <a href="catalogo.php">Catálogo y Manual</a>
+            <a href="reportes.php">Reportes</a>
         </div>
     </div>
-
     <div class="main">
         <!-- Formulario de Entrada Eficiente -->
         <div class="card-custom">
