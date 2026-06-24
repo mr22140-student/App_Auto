@@ -1,3 +1,10 @@
+<?php
+// 1. Incluimos la conexión a la base de datos para jalar los clientes
+include("conexion.php");
+
+// 2. Traemos la consulta de los clientes
+$resultado_clientes = mysqli_query($conn, "SELECT * FROM cliente");
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,15 +19,17 @@
         <div>
             <a href="index.php">Inicio</a>
             <a href="productos.php">Productos</a>
+            <a href="clientes.php">Clientes</a>
             <a href="ventas.php">Ventas</a>
             <a href="compras.php">Compras</a>
             <a href="librodiario.php">Libro Diario</a>
             <a href="catalogo.php">Catálogo y Manual</a>
+            <a href="reportes.php">Reportes</a>
         </div>
     </div>
 
     <div class="main">
-        <div class="card-custom text-center py-5">
+        <div class="card-custom text-center py-5 mb-4">
             <h1 class="display-4 text-secondary mb-3">Bienvenido al ERP Auto Repuestos</h1>
             <p class="lead text-muted">Sistema integrado de inventario, facturación multimétodo y contabilidad automatizada por partida doble.</p>
             <hr class="my-4" style="max-width: 400px; margin: auto;">
@@ -30,6 +39,32 @@
                 <a href="librodiario.php" class="btn btn-dark px-4">Ver Libro Diario</a>
             </div>
         </div>
+
+        <div class="table-container">
+            <h3 class="mb-4 text-warning">Nuestros Clientes Registrados</h3>
+
+            <?php 
+            // Validamos si hay clientes en la base de datos para evitar errores
+            if(mysqli_num_rows($resultado_clientes) > 0) {
+                while($fila = mysqli_fetch_assoc($resultado_clientes)){ 
+            ?>
+                <div class="mb-4 border-bottom border-secondary pb-3">
+                    <strong>
+                        <?php echo $fila['nombre']." ".$fila['apellido']; ?>
+                    </strong>
+                    <br>
+                    <span class="text-white-50">
+                        <?php echo !empty($fila['telefono']) ? $fila['telefono'] : 'Sin teléfono'; ?> | 
+                        <?php echo !empty($fila['correo']) ? $fila['correo'] : 'Sin correo'; ?>
+                    </span>
+                </div>
+            <?php 
+                } 
+            } else {
+                echo "<p class='text-muted'>No hay clientes registrados en el sistema todavía.</p>";
+            }
+            ?>
+        </div>
     </div>
 </body>
-</html> 
+</html>
