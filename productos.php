@@ -22,7 +22,7 @@ $productos = mysqli_query($conn, "SELECT * FROM producto ORDER BY id DESC");
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Productos - ERP</title>
+    <title>Productos - ERP Auto Repuestos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
@@ -51,30 +51,58 @@ $productos = mysqli_query($conn, "SELECT * FROM producto ORDER BY id DESC");
             font-weight: bold;
             border: none;
         }
+        
+        /* Estilos integrados para evitar que rompa el diseño del menú */
+        .nav-link-custom { color: #e0e0e0; text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 6px 10px; border-radius: 4px; transition: all 0.2s ease; }
+        .nav-link-custom:hover { color: #ffc107; background-color: rgba(255, 193, 7, 0.05); }
+        .nav-dropdown-btn { font-size: 0.88rem !important; padding: 5px 12px !important; border-radius: 4px !important; box-shadow: none !important; }
+        .custom-dropdown-ul { background-color: #262626 !important; border: 1px solid #444 !important; padding: 6px 0 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        .custom-dropdown-ul .dropdown-item { font-size: 0.9rem !important; padding: 7px 16px !important; color: #ffffff !important; transition: background 0.15s ease; }
+        .custom-dropdown-ul .dropdown-item:hover { background-color: #ffc107 !important; color: #000000 !important; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="navbar-custom">
-        <span class="navbar-title">ERP Auto Repuestos</span>
-        <div>
-            <a href="index.php">Inicio</a>
-            <a href="productos.php">Productos</a>
-            <a href="clientes.php">Clientes</a>
-            <a href="ventas.php">Ventas</a>
-            <a href="compras.php">Compras</a>
-            <a href="librodiario.php">Libro Diario</a>
-            <a href="libromayor.php">Libro Mayor</a>
-            <a href="catalogo.php">Catálogo y Manual</a>
-            <a href="razones.php">Razones Financieras</a>
-            <a href="balance_general.php">Balance General</a>
-            <a href="balance_comprobacion.php">Balance Comprobación</a>
-            <a href="analisis_financiero.php">Análisis H/V</a>
-            <a href="reportes_financieros.php">Reportes Financieros</a>
-            <a href="reportes.php">Reportes</a>
+
+    <div class="navbar-custom" style="background-color: #262626; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333;">
+        <span class="navbar-title" style="font-weight: bold; font-size: 1.35rem; color: #ffc107; letter-spacing: 0.5px;">
+            ERP Auto Repuestos
+        </span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <a href="index.php" class="nav-link-custom">Inicio</a>
+            <a href="productos.php" class="nav-link-custom" style="color: #ffc107; font-weight: bold;">Productos</a>
+            <a href="clientes.php" class="nav-link-custom">Clientes</a>
+            <a href="ventas.php" class="nav-link-custom">Ventas</a>
+            <a href="compras.php" class="nav-link-custom">Compras</a>
+            <a href="catalogo.php" class="nav-link-custom">Catálogo y Manual</a>
+            
+            <div class="dropdown" style="display: inline-block;">
+                <button class="btn btn-outline-light btn-sm dropdown-toggle fw-bold nav-dropdown-btn" type="button" id="dropContabilidad" data-bs-toggle="dropdown" aria-expanded="false">
+                    📖 Contabilidad
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark custom-dropdown-ul" aria-labelledby="dropContabilidad">
+                    <li><a class="dropdown-item" href="librodiario.php">Libro Diario</a></li>
+                    <li><a class="dropdown-item" href="libromayor.php">Libro Mayor</a></li>
+                    <li><a class="dropdown-item" href="razones.php">Razones Financieras</a></li>
+                </ul>
+            </div>
+
+            <div class="dropdown" style="display: inline-block;">
+                <button class="btn btn-warning btn-sm dropdown-toggle fw-bold text-dark nav-dropdown-btn" type="button" id="dropReportes" data-bs-toggle="dropdown" aria-expanded="false">
+                    📊 Estados y Reportes
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark custom-dropdown-ul" aria-labelledby="dropReportes">
+                    <li><a class="dropdown-item" href="balance_comprobacion.php">Balance de Comprobación</a></li>
+                    <li><a class="dropdown-item" href="balance_general.php">Balance General</a></li>
+                    <li><a class="dropdown-item" href="analisis_financiero.php">Análisis H/V</a></li>
+                    <li><hr class="dropdown-divider" style="border-color: #444;"></li>
+                    <li><a class="dropdown-item" href="reportes_financieros.php">Reportes Financieros</a></li>
+                    <li><a class="dropdown-item" href="reportes.php">Módulo de Reportes</a></li>
+                </ul>
+            </div>
         </div>
     </div>
-    <div class="main">
-        <!-- Formulario de Entrada Eficiente -->
+
+    <div class="main container py-4">
         <div class="card-custom">
             <h3 class="mb-4 text-secondary-custom">Ingresar Nuevo Repuesto Catálogo</h3>
             <form action="productos.php" method="POST">
@@ -95,7 +123,6 @@ $productos = mysqli_query($conn, "SELECT * FROM producto ORDER BY id DESC");
                         <label class="form-label text-white-50">Precio Público</label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
-                            <!-- Entrada fluida tipo texto, bloquea negativos y caracteres no numéricos al instante -->
                             <input 
                                 type="text" 
                                 name="precio" 
@@ -116,7 +143,6 @@ $productos = mysqli_query($conn, "SELECT * FROM producto ORDER BY id DESC");
             </form>
         </div>
 
-        <!-- Tabla de Inventario con Contraste Mejorado -->
         <div class="card-custom">
             <h3 class="mb-3 text-white-50">Inventario Maestro</h3>
             <div class="table-responsive">
@@ -134,9 +160,9 @@ $productos = mysqli_query($conn, "SELECT * FROM producto ORDER BY id DESC");
                     <tbody>
                         <?php while($f = mysqli_fetch_assoc($productos)){ ?>
                         <tr>
-                            <td><code><?php echo $f['codigo']; ?></code></td>
-                            <td><strong><?php echo $f['nombre']; ?></strong></td>
-                            <td><?php echo $f['marca']; ?></td>
+                            <td><code><?php echo htmlspecialchars($f['codigo'], ENT_QUOTES, 'UTF-8'); ?></code></td>
+                            <td><strong><?php echo htmlspecialchars($f['nombre'], ENT_QUOTES, 'UTF-8'); ?></strong></td>
+                            <td><?php echo htmlspecialchars($f['marca'], ENT_QUOTES, 'UTF-8'); ?></td>
                             <td class="text-end fw-bold text-warning">$<?php echo number_format($f['precio'], 2); ?></td>
                             <td class="text-center">
                                 <span class="badge <?php echo ($f['stock'] > 5) ? 'bg-success' : 'bg-danger'; ?> fs-6">
@@ -153,5 +179,7 @@ $productos = mysqli_query($conn, "SELECT * FROM producto ORDER BY id DESC");
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
