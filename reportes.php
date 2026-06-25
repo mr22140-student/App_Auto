@@ -57,7 +57,7 @@ if($porcentaje_costo > 100) $porcentaje_costo = 100;
         <div class="row g-4 mb-4">
             <div class="col-md-4">
                 <div class="card-custom p-4 border-start border-warning border-4 h-100" style="background-color: #1a1a1a;">
-                    <span class="text-muted text-uppercase small fw-bold">Ingresos Totales (Ventas)</span>
+                    <span class="text-white-50 text-uppercase small fw-bold" style="letter-spacing: 0.5px;">Ingresos Totales (Ventas)</span>
                     <h2 class="text-warning mt-2 fw-bold">$<?php echo number_format($total_ventas, 2); ?></h2>
                     <small class="text-white-50">Reflejado en Caja y Bancos</small>
                 </div>
@@ -65,7 +65,7 @@ if($porcentaje_costo > 100) $porcentaje_costo = 100;
 
             <div class="col-md-4">
                 <div class="card-custom p-4 border-start border-secondary border-4 h-100" style="background-color: #1a1a1a;">
-                    <span class="text-muted text-uppercase small fw-bold">Costos Operativos (Compras)</span>
+                    <span class="text-white-50 text-uppercase small fw-bold" style="letter-spacing: 0.5px;">Costos Operativos (Compras)</span>
                     <h2 class="text-white mt-2 fw-bold">$<?php echo number_format($total_compras, 2); ?></h2>
                     <small class="text-white-50">Inversión en inventario de repuestos</small>
                 </div>
@@ -74,15 +74,15 @@ if($porcentaje_costo > 100) $porcentaje_costo = 100;
             <div class="col-md-4">
                 <?php if ($utilidad_neta >= 0): ?>
                     <div class="card-custom p-4 border-start border-success border-4 h-100" style="background-color: #1a1a1a;">
-                        <span class="text-muted text-uppercase small fw-bold">Utilidad Neta del Ejercicio</span>
+                        <span class="text-white-50 text-uppercase small fw-bold" style="letter-spacing: 0.5px;">Utilidad Neta del Ejercicio</span>
                         <h2 class="text-success mt-2 fw-bold">$<?php echo number_format($utilidad_neta, 2); ?></h2>
-                        <small class="text-success-50">✔ El negocio está generando ganancias</small>
+                        <small class="text-success" style="opacity: 0.8;">✔ El negocio está generando ganancias</small>
                     </div>
                 <?php else: ?>
                     <div class="card-custom p-4 border-start border-danger border-4 h-100" style="background-color: #1a1a1a;">
-                        <span class="text-muted text-uppercase small fw-bold">Pérdida Neta del Ejercicio</span>
+                        <span class="text-white-50 text-uppercase small fw-bold" style="letter-spacing: 0.5px;">Pérdida Neta del Ejercicio</span>
                         <h2 class="text-danger mt-2 fw-bold">$<?php echo number_format(abs($utilidad_neta), 2); ?></h2>
-                        <small class="text-danger-50">⚠ Los costos superan los ingresos actuales</small>
+                        <small class="text-danger" style="opacity: 0.8;">⚠ Los costos superan los ingresos actuales</small>
                     </div>
                 <?php endif; ?>
             </div>
